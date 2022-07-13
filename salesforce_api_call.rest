@@ -1,0 +1,25 @@
+# @name getAssertion
+get http://localhost:3000/api/jwtauth/generatetoken
+
+
+####
+@assertionInput = {{getAssertion.response.body.token}}
+
+# @name generateToken
+POST https://mscdirect--devsudeep.my.salesforce.com/services/oauth2/token?grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer&assertion={{assertionInput}}
+Content-Type: application/x-www-form-urlencoded
+
+####
+@instance_url = {{generateToken.response.body.instance_url}}
+@accessToken = {{generateToken.response.body.access_token}}
+# @name describeAccount
+GET {{instance_url}}/services/data/v54.0/sobjects/account/describe
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+
+####
+# @name getContacts
+
+get {{instance_url}}/services/data/v52.0/query/?q=SELECT+FirstName,LastName,Email+FROM+Contact+LIMIT+10
+Authorization: Bearer {{accessToken}}
